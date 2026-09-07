@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アカウント設定 - pokochanのWebサイト</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    h1 { font-size: 24px; margin-bottom: 24px; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+    h2 { font-size: 18px; margin-top: 32px; margin-bottom: 16px; color: #38bdf8; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #94a3b8; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+    .btn-save { background: #38bdf8; color: #0f172a; margin-top: 10px; }
+    .btn-save:hover { background: #7dd3fc; }
+    .btn-link { background: #334155; color: #fff; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-link:hover { background: #475569; }
+    .btn-link:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 4px; background: #22c55e; color: #fff; margin-left: auto; }
+    .nav-links { margin-bottom: 20px; }
+    .nav-links a { color: #38bdf8; text-decoration: none; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="nav-links">
+      <a href="../dashboard/">← ダッシュボードに戻る</a>
+    </div>
+
+    <h1>アカウント設定</h1>
+
+    <!-- 1. プロフィール情報変更 -->
+    <form id="profile-form">
+      <h2>プロフィール変更</h2>
+      <div class="form-group">
+        <label for="displayName">表示名（ニックネーム）</label>
+        <input type="text" id="displayName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="birthdate">生年月日</label>
+        <input type="date" id="birthdate" required>
+      </div>
+
+      <div class="form-group">
+        <label for="gender">性別</label>
+        <select id="gender">
+          <option value="未設定">回答しない</option>
+          <option value="男性">男性</option>
+          <option value="女性">女性</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-save">設定を保存</button>
+    </form>
+
+    <!-- 2. SNSアカウント連携 -->
+    <h2>SNSアカウント連携</h2>
+    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+      連携すると、どちらのアカウントからログインしても同じデータにアクセスできるようになります。
+    </p>
+
+    <button id="btn-link-google" class="btn btn-link">
+      <span>Google アカウントを連携</span>
+      <span id="google-status"></span>
+    </button>
+
+    <button id="btn-link-github" class="btn btn-link">
+      <span>GitHub アカウントを連携</span>
+      <span id="github-status"></span>
+    </button>
+  </div>
+
+  <script type="module">
+    import { 
+      auth, 
+      db, 
+      doc, 
+      getDoc, 
+      updateDoc, 
+      googleProvider, 
+      githubProvider, 
+      linkWithPopup, 
+      onAuthStateChanged 
+    } from '../lib/firebase.js';
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = '../login/';
+        return;
+      }
+
+      currentUser = user;
+
+      // 連携中のアカウントプロバイダーを確認して表示を切り替え
+      checkLinkedProviders(user);
+
+      // Firestoreからプロフィール情報を読み込み
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById('displayName').value = data.name || '';
+        document.getElementById('birthdate').value = data.birthdate || '';
+        document.getElementById('gender').value = data.gender || '未設定';
+      }
+    });
+
+    // 連携状態のチェック
+    function checkLinkedProviders(user) {
+      const providers = user.providerData.map(p => p.providerId);
+
+      const googleBtn = document.getElementById('btn-link-google');
+      const googleStatus = document.getElementById('google-status');
+      if (providers.includes('google.com')) {
+        googleStatus.textContent = '連携済み';
+        googleStatus.className = 'status-badge';
+        googleBtn.disabled = true;
+      }
+
+      const githubBtn = document.getElementById('btn-link-github');
+      const githubStatus = document.getElementById('github-status');
+      if (providers.includes('github.com')) {
+        githubStatus.textContent = '連携済み';
+        githubStatus.className = 'status-badge';
+        githubBtn.disabled = true;
+      }
+    }
+
+    // プロフィール変更の保存
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      try {
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          name: document.getElementById('displayName').value,
+          birthdate: document.getElementById('birthdate').value,
+          gender: document.getElementById('gender').value,
+          updatedAt: new Date()
+        });
+        alert('プロフィールを保存しました！');
+      } catch (error) {
+        alert('保存に失敗しました: ' + error.message);
+      }
+    });
+
+    // Google アカウント連携
+    document.getElementById('btn-link-google').addEventListener('click', async () => {
+      if (!currentUser) return;
+      try {
+        await linkWithPopup(currentUser, googleProvider);
+        alert('Google アカウントと連携しました！');
+        checkLinkedProviders(currentUser);
+      } catch (error) {
+        alert('連携に失敗しました: ' + error.message);
+      }
+    });
+
+    // GitHub アカウント連携
+    document.getElementById('btn-link-github').addEventListener('click', async () => {
+      if (!currentUser) return;
+      try {
+        await linkWithPopup(currentUser, githubProvider);
+        alert('GitHub アカウントと連携しました！');
+        checkLinkedProviders(currentUser);
+      } catch (error) {
+        alert('連携に失敗しました: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
