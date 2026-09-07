@@ -30,7 +30,6 @@
     <button id="btn-github">GitHubでログイン</button>
   </div>
 
-  <!-- Firebase処理（親階層の lib/firebase.js を読み込む） -->
   <script type="module">
     import { 
       auth, 
@@ -40,7 +39,7 @@
       onAuthStateChanged 
     } from '../lib/firebase.js';
 
-    // すでにログインしている場合はトップページへリダイレクト
+    // ログイン状態を常に監視：ログインしたら自動でトップページへ移動
     onAuthStateChanged(auth, (user) => {
       if (user) {
         window.location.href = '../';
@@ -51,9 +50,12 @@
     document.getElementById('btn-google').addEventListener('click', async () => {
       try {
         await signInWithPopup(auth, googleProvider);
-        window.location.href = '../';
+        // 移動処理は onAuthStateChanged に任せるため、ここでは行わない
       } catch (error) {
-        alert('Googleログイン失敗: ' + error.message);
+        // ユーザーがポップアップを閉じただけの場合はアラートを出さない
+        if (error.code !== 'auth/popup-closed-by-user') {
+          alert('Googleログイン失敗: ' + error.message);
+        }
       }
     });
 
@@ -61,9 +63,12 @@
     document.getElementById('btn-github').addEventListener('click', async () => {
       try {
         await signInWithPopup(auth, githubProvider);
-        window.location.href = '../';
+        // 移動処理は onAuthStateChanged に任せるため、ここでは行わない
       } catch (error) {
-        alert('GitHubログイン失敗: ' + error.message);
+        // ユーザーがポップアップを閉じただけの場合はアラートを出さない
+        if (error.code !== 'auth/popup-closed-by-user') {
+          alert('GitHubログイン失敗: ' + error.message);
+        }
       }
     });
   </script>
