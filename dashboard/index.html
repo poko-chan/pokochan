@@ -3,37 +3,282 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ダッシュボード - pokochanのWebサイト</title>
+  <title>ダッシュボード - pokochan</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 50px; }
-    .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 400px; margin: 20px auto; }
-    .user-icon { width: 80px; height: 80px; border-radius: 50%; }
-    button { padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ヘッダーナビゲーション */
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-header {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+    .btn-settings {
+      background: #334155;
+      color: #f8fafc;
+    }
+    .btn-settings:hover { background: #475569; }
+    .btn-logout {
+      background: #ef4444;
+      color: #fff;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* メインコンテンツエリア */
+    main {
+      max-width: 1000px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+
+    /* ウェルカムバナー */
+    .welcome-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    /* 画像代わりのイニシャルアバター */
+    .avatar-initial {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-size: 28px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .welcome-text h1 {
+      font-size: 24px;
+      margin: 0 0 4px 0;
+    }
+    .welcome-text p {
+      color: #94a3b8;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* ダッシュボードグリッドレイアウト */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card h2 {
+      font-size: 16px;
+      color: #38bdf8;
+      margin-top: 0;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* プロフィールリスト */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+      font-size: 14px;
+    }
+    .info-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .info-label { color: #94a3b8; }
+    .info-value { font-weight: 500; }
+
+    /* 連携アカウント状態 */
+    .provider-status {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .provider-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .badge-linked { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-unlinked { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid #475569; }
+
+    /* クイックアクション */
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #f8fafc;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 0.2s;
+    }
+    .action-btn:hover {
+      border-color: #38bdf8;
+    }
   </style>
 </head>
 <body>
 
-  <h1>ダッシュボード</h1>
+  <!-- ヘッダー -->
+  <header>
+    <div class="logo">pokochan Dashboard</div>
+    <div class="header-actions">
+      <a href="../settings/" class="btn-header btn-settings">⚙️ アカウント設定</a>
+      <button id="btn-logout" class="btn-header btn-logout" type="button">ログアウト</button>
+    </div>
+  </header>
 
-  <div class="card">
-    <img id="user-icon" class="user-icon" src="" alt="ユーザーアイコン">
-    <h2 id="user-name">読み込み中...</h2>
-    <p>Email: <span id="user-email">-</span></p>
-    <p>生年月日: <span id="user-birthdate">-</span></p>
-    <button id="btn-logout">ログアウト</button>
-  </div>
-  <div style="margin-top: 20px;">
-    <a href="../settings/" style="color: #38bdf8; text-decoration: none; font-weight: bold;">
-    ⚙️ 設定
-    </a>
-  </div>
+  <!-- メインビュー -->
+  <main>
+    <!-- ウェルカムカード -->
+    <div class="welcome-card">
+      <div id="avatar-initial" class="avatar-initial">-</div>
+      <div class="welcome-text">
+        <h1 id="welcome-name">読み込み中...</h1>
+        <p id="welcome-username">@loading</p>
+      </div>
+    </div>
+
+    <!-- グリッド表示 -->
+    <div class="dashboard-grid">
+
+      <!-- 1. プロフィール詳細情報 -->
+      <div class="card">
+        <h2>👤 プロフィール情報</h2>
+        <div class="info-list">
+          <div class="info-item">
+            <span class="info-label">表示名</span>
+            <span id="info-name" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">ユーザー名</span>
+            <span id="info-username" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">メールアドレス</span>
+            <span id="info-email" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">性別</span>
+            <span id="info-gender" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">誕生日</span>
+            <span id="info-birthdate" class="info-value">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. アカウント連携ステータス -->
+      <div class="card">
+        <h2>🔗 アカウント連携状態</h2>
+        <div class="provider-status">
+          <div class="provider-item">
+            <span>メール / パスワード</span>
+            <span class="badge badge-linked">登録済み</span>
+          </div>
+          <div class="provider-item">
+            <span>Google アカウント</span>
+            <span id="badge-google" class="badge badge-unlinked">未連携</span>
+          </div>
+          <div class="provider-item">
+            <span>GitHub アカウント</span>
+            <span id="badge-github" class="badge badge-unlinked">未連携</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. クイックアクセス / メニュー -->
+      <div class="card">
+        <h2>⚡️ クイックメニュー</h2>
+        <div class="quick-actions">
+          <a href="../settings/" class="action-btn">
+            <span>アカウント情報・連携設定を変更</span>
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
 
   <script type="module">
     import { auth, db, doc, getDoc, signOut, onAuthStateChanged } from '../lib/firebase.js';
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // 未ログイン時はログイン画面へ
         window.location.href = '../login/';
         return;
       }
@@ -42,24 +287,49 @@
       const userSnap = await getDoc(doc(db, 'users', user.uid));
 
       if (!userSnap.exists()) {
-        // 生年月日などのプロフィールデータが無い場合は登録画面へ戻す
         window.location.href = '../onboarding/';
         return;
       }
 
-      // 画面に情報をセット
-      const userData = userSnap.data();
-      document.getElementById('user-name').textContent = user.displayName || 'ゲスト';
-      document.getElementById('user-email').textContent = user.email || '非公開';
-      document.getElementById('user-icon').src = user.photoURL || '';
-      document.getElementById('user-birthdate').textContent = userData.birthdate || '未設定';
+      const data = userSnap.data();
+
+      // 表示データのセット
+      const displayName = data.name || 'ユーザー';
+      const username = data.username ? `@${data.username}` : '@未設定';
+
+      // 1. ウェルカムエリア（画像なし、イニシャルアイコン化）
+      document.getElementById('avatar-initial').textContent = displayName.charAt(0).toUpperCase();
+      document.getElementById('welcome-name').textContent = `${displayName} さん、おかえりなさい！`;
+      document.getElementById('welcome-username').textContent = username;
+
+      // 2. プロフィール詳細カード
+      document.getElementById('info-name').textContent = displayName;
+      document.getElementById('info-username').textContent = username;
+      document.getElementById('info-email').textContent = user.email || '-';
+      document.getElementById('info-gender').textContent = data.gender || '未設定';
+      document.getElementById('info-birthdate').textContent = data.birthdate || '未設定';
+
+      // 3. SNS連携ステータスチェック
+      const linkedProviders = user.providerData.map(p => p.providerId);
+
+      const googleBadge = document.getElementById('badge-google');
+      if (linkedProviders.includes('google.com')) {
+        googleBadge.textContent = '連携済み';
+        googleBadge.className = 'badge badge-linked';
+      }
+
+      const githubBadge = document.getElementById('badge-github');
+      if (linkedProviders.includes('github.com')) {
+        githubBadge.textContent = '連携済み';
+        githubBadge.className = 'badge badge-linked';
+      }
     });
 
-    // ログアウト処理
+    // ログアウトボタン
     document.getElementById('btn-logout').addEventListener('click', async () => {
       await signOut(auth);
       window.location.href = '../login/';
     });
   </script>
 </body>
-</html>
+</html>ｓ
