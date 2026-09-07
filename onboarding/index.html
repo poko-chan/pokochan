@@ -3,77 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>初期登録 - pokochanのWebサイト</title>
+  <title>初期設定 - pokochanのWebサイト</title>
   <style>
-    body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 20px; }
-    .form-group { margin-bottom: 20px; text-align: left; }
-    label { display: block; margin-bottom: 6px; font-weight: bold; }
-    input, select, textarea { 
-      width: 100%; 
-      padding: 10px; 
-      box-sizing: border-box; 
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 15px;
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    textarea { resize: vertical; height: 80px; }
-    button { 
-      width: 100%; 
-      padding: 12px; 
-      background: #0070f3; 
-      color: white; 
-      border: none; 
-      border-radius: 5px; 
-      font-size: 16px; 
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      padding: 30px;
+      background: #1e293b;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* プログレスバー */
+    .progress-bar {
+      height: 4px;
+      background: #334155;
+      border-radius: 2px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 33.3%;
+      background: #38bdf8;
+      transition: width 0.4s ease;
+    }
+
+    /* 質問ステップのスタイルと切り替えアニメーション */
+    .step {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+    }
+    .step.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: #f8fafc;
+    }
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: #38bdf8;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+    }
+    button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
       font-weight: bold;
-      cursor: pointer; 
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
     }
-    button:hover { background: #0051a8; }
+    .btn-next { background: #38bdf8; color: #0f172a; }
+    .btn-next:hover { background: #7dd3fc; }
+    .btn-back { background: #334155; color: #94a3b8; }
+    .btn-back:hover { background: #475569; color: #fff; }
   </style>
 </head>
 <body>
 
-  <h1>プロフィール初期設定</h1>
-  <p>サービスを利用するためにプロフィール情報を入力してください。</p>
+  <div class="container">
+    <!-- プログレスバー -->
+    <div class="progress-bar">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
 
-  <form id="onboarding-form">
-    <!-- 1. ユーザー名（表示名） -->
-    <div class="form-group">
-      <label for="displayName">表示名（ニックネーム） *</label>
+    <!-- Step 1: 名前 -->
+    <div id="step-1" class="step active">
+      <h2>まずはお名前を教えてください</h2>
+      <p class="subtitle">サイト内で表示されるニックネームです</p>
       <input type="text" id="displayName" placeholder="例: ポコちゃん" required>
+      <div class="btn-group">
+        <button type="button" class="btn-next" onclick="nextStep(1)">次へ</button>
+      </div>
     </div>
 
-    <!-- 2. 生年月日 -->
-    <div class="form-group">
-      <label for="birthdate">生年月日 *</label>
+    <!-- Step 2: 生年月日 -->
+    <div id="step-2" class="step">
+      <h2>生年月日を教えてください</h2>
+      <p class="subtitle">あなたに合わせた情報をお届けします</p>
       <input type="date" id="birthdate" required>
+      <div class="btn-group">
+        <button type="button" class="btn-back" onclick="prevStep(2)">戻る</button>
+        <button type="button" class="btn-next" onclick="nextStep(2)">次へ</button>
+      </div>
     </div>
 
-    <!-- 3. 性別 -->
-    <div class="form-group">
-      <label for="gender">性別</label>
+    <!-- Step 3: 性別 -->
+    <div id="step-3" class="step">
+      <h2>性別を教えてください</h2>
+      <p class="subtitle">該当するものをお選びください（スキップ可）</p>
       <select id="gender">
         <option value="未設定">回答しない</option>
         <option value="男性">男性</option>
         <option value="女性">女性</option>
         <option value="その他">その他</option>
       </select>
+      <div class="btn-group">
+        <button type="button" class="btn-back" onclick="prevStep(3)">戻る</button>
+        <button type="button" id="btn-submit" class="btn-next">完了してスタート</button>
+      </div>
     </div>
-
-    <!-- 4. Webサイト / SNSリンク -->
-    <div class="form-group">
-      <label for="website">Webサイト / X (Twitter) URL</label>
-      <input type="url" id="website" placeholder="https://example.com">
-    </div>
-
-    <!-- 5. 自己紹介 -->
-    <div class="form-group">
-      <label for="bio">自己紹介</label>
-      <textarea id="bio" placeholder="はじめまして！よろしくお願いします。"></textarea>
-    </div>
-
-    <button type="submit">登録してダッシュボードへ</button>
-  </form>
+  </div>
 
   <script type="module">
     import { auth, db, doc, setDoc, onAuthStateChanged } from '../lib/firebase.js';
@@ -82,43 +156,57 @@
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // 未ログイン時はログイン画面に戻す
         window.location.href = '../login/';
       } else {
         currentUser = user;
-        // 初期値としてGoogle/GitHubの表示名を入れておく
-        if (user.displayName) {
+        if (user.displayName && !document.getElementById('displayName').value) {
           document.getElementById('displayName').value = user.displayName;
         }
       }
     });
 
-    document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // ステップ管理関数をグローバルに登録
+    window.nextStep = (current) => {
+      if (current === 1 && !document.getElementById('displayName').value.trim()) {
+        alert('お名前を入力してください');
+        return;
+      }
+      if (current === 2 && !document.getElementById('birthdate').value) {
+        alert('生年月日を選択してください');
+        return;
+      }
 
+      document.getElementById(`step-${current}`).classList.remove('active');
+      const next = current + 1;
+      document.getElementById(`step-${next}`).classList.add('active');
+      document.getElementById('progress-fill').style.width = `${(next / 3) * 100}%`;
+    };
+
+    window.prevStep = (current) => {
+      document.getElementById(`step-${current}`).classList.remove('active');
+      const prev = current - 1;
+      document.getElementById(`step-${prev}`).classList.add('active');
+      document.getElementById('progress-fill').style.width = `${(prev / 3) * 100}%`;
+    };
+
+    // 最終送信処理
+    document.getElementById('btn-submit').addEventListener('click', async () => {
       if (!currentUser) return;
 
-      // フォームの値を取得
       const displayName = document.getElementById('displayName').value;
       const birthdate = document.getElementById('birthdate').value;
       const gender = document.getElementById('gender').value;
-      const website = document.getElementById('website').value;
-      const bio = document.getElementById('bio').value;
 
       try {
-        // Firestoreの users/{uid} ドキュメントにまとめて保存
         await setDoc(doc(db, 'users', currentUser.uid), {
           name: displayName,
           email: currentUser.email,
           photoURL: currentUser.photoURL || '',
           birthdate: birthdate,
           gender: gender,
-          website: website,
-          bio: bio,
           createdAt: new Date()
         });
 
-        // 保存完了後にダッシュボードへ移動
         window.location.href = '../dashboard/';
       } catch (error) {
         alert('保存に失敗しました: ' + error.message);
