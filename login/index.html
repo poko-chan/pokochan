@@ -96,19 +96,96 @@
       margin-bottom: 12px;
       display: none;
     }
+
+    /* 区切り線 */
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 24px 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #334155;
+    }
+    .divider:not(:empty)::before {
+      margin-right: .75em;
+    }
+    .divider:not(:empty)::after {
+      margin-left: .75em;
+    }
+
+    /* SNSログインボタン */
+    .sns-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .btn-sns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #f8fafc;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-sns:hover {
+      background: #1e293b;
+      border-color: #94a3b8;
+    }
+    .sns-icon {
+      width: 20px;
+      height: 20px;
+    }
   </style>
 </head>
 <body>
 
   <div class="auth-card">
+    <!-- SNSログインボタンエリア（ロゴ付き） -->
+    <div class="sns-container">
+      <button id="btn-google" class="btn-sns" type="button">
+        <!-- Google Logo SVG -->
+        <svg class="sns-icon" viewBox="0 0 24 24">
+          <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.1 9 5 12 5z"/>
+          <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+          <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9c-.8-.8-1.4-1.9-1.4-3.1z"/>
+          <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.1-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z"/>
+        </svg>
+        Googleでログイン
+      </button>
+
+      <button id="btn-github" class="btn-sns" type="button">
+        <!-- GitHub Logo SVG -->
+        <svg class="sns-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        GitHubでログイン
+      </button>
+    </div>
+
+    <div class="divider">または</div>
+
+    <!-- タブ切り替え（メールアドレス用） -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('login')">ログイン</button>
-      <button class="tab-btn" onclick="switchTab('register')">新規登録</button>
+      <button class="tab-btn active" type="button" onclick="switchTab('login')">ログイン</button>
+      <button class="tab-btn" type="button" onclick="switchTab('register')">新規登録</button>
     </div>
 
     <div id="error-msg" class="error-msg"></div>
 
-    <!-- 1. ログインフォーム -->
+    <!-- 1. メールログインフォーム -->
     <form id="login-form" class="form-container active">
       <div class="form-group">
         <label for="login-email">メールアドレス</label>
@@ -118,10 +195,10 @@
         <label for="login-password">パスワード</label>
         <input type="password" id="login-password" placeholder="••••••••" required>
       </div>
-      <button type="submit" class="btn-submit">ログイン</button>
+      <button type="submit" class="btn-submit">メールでログイン</button>
     </form>
 
-    <!-- 2. 新規登録フォーム -->
+    <!-- 2. メール新規登録フォーム -->
     <form id="register-form" class="form-container">
       <div class="form-group">
         <label for="reg-email">メールアドレス</label>
@@ -138,23 +215,41 @@
   <script type="module">
     import { 
       auth, 
+      db,
+      doc,
+      getDoc,
+      googleProvider,
+      githubProvider,
+      signInWithPopup,
       createUserWithEmailAndPassword, 
       signInWithEmailAndPassword,
       onAuthStateChanged 
     } from '../lib/firebase.js';
-
-    // 既にログイン済みの場合はダッシュボードへ移動
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.location.href = '../dashboard/';
-      }
-    });
 
     const errorEl = document.getElementById('error-msg');
 
     function showError(msg) {
       errorEl.textContent = msg;
       errorEl.style.display = 'block';
+    }
+
+    // ユーザー状態に応じた適切なページへ振り分ける関数
+    async function redirectUser(user) {
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          // プロフィール作成済みならダッシュボードへ
+          window.location.href = '../dashboard/';
+        } else {
+          // 未登録（初回）なら質問画面へ
+          window.location.href = '../onboarding/';
+        }
+      } catch (err) {
+        console.error('Firestore check error:', err);
+        window.location.href = '../onboarding/';
+      }
     }
 
     // タブ切り替え処理
@@ -172,7 +267,31 @@
       }
     };
 
-    // ログイン処理
+    // Google SNSログイン
+    document.getElementById('btn-google').addEventListener('click', async () => {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        await redirectUser(result.user);
+      } catch (error) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          showError('Googleログイン失敗: ' + error.message);
+        }
+      }
+    });
+
+    // GitHub SNSログイン
+    document.getElementById('btn-github').addEventListener('click', async () => {
+      try {
+        const result = await signInWithPopup(auth, githubProvider);
+        await redirectUser(result.user);
+      } catch (error) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          showError('GitHubログイン失敗: ' + error.message);
+        }
+      }
+    });
+
+    // メールログイン処理
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       errorEl.style.display = 'none';
@@ -180,14 +299,14 @@
       const password = document.getElementById('login-password').value;
 
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = '../dashboard/';
+        const res = await signInWithEmailAndPassword(auth, email, password);
+        await redirectUser(res.user);
       } catch (error) {
-        showError('ログインに失敗しました: ' + translateErrorMessage(error.code));
+        showError('ログイン失敗: ' + translateErrorMessage(error.code));
       }
     });
 
-    // 新規登録処理
+    // メール新規登録処理
     document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       errorEl.style.display = 'none';
@@ -196,14 +315,13 @@
 
       try {
         await createUserWithEmailAndPassword(auth, email, password);
-        // 新規登録成功時はオンボーディング画面（初期設定）へ移動
         window.location.href = '../onboarding/';
       } catch (error) {
-        showError('登録に失敗しました: ' + translateErrorMessage(error.code));
+        showError('登録失敗: ' + translateErrorMessage(error.code));
       }
     });
 
-    // Firebaseエラーメッセージを日本語化
+    // エラーメッセージの日本語変換
     function translateErrorMessage(code) {
       switch (code) {
         case 'auth/email-already-in-use':
@@ -217,7 +335,7 @@
         case 'auth/user-not-found':
           return 'メールアドレスまたはパスワードが正しくありません。';
         default:
-          return 'エラーが発生しました。時間をおいて再試行してください。';
+          return 'エラーが発生しました。';
       }
     }
   </script>
