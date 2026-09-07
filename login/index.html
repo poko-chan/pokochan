@@ -5,19 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ログイン - pokochanのWebサイト</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 50px;
-    }
-    button {
-      padding: 12px 24px;
-      font-size: 16px;
-      margin: 10px;
-      cursor: pointer;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 50px; }
+    button { padding: 12px 24px; font-size: 16px; margin: 10px; cursor: pointer; border-radius: 6px; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
@@ -33,16 +22,29 @@
   <script type="module">
     import { 
       auth, 
+      db, 
+      doc, 
+      getDoc, 
       googleProvider, 
       githubProvider, 
       signInWithPopup, 
       onAuthStateChanged 
     } from '../lib/firebase.js';
 
-    // ログイン状態を常に監視：ログインしたら自動でトップページへ移動
-    onAuthStateChanged(auth, (user) => {
+    // ログイン検知と振り分け処理
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        window.location.href = '../';
+        // Firestoreからユーザープロフィールを確認
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          // プロフィール登録済みならダッシュボードへ
+          window.location.href = '../dashboard/';
+        } else {
+          // 未登録なら質問画面（初期登録）へ
+          window.location.href = '../onboarding/';
+        }
       }
     });
 
@@ -50,9 +52,7 @@
     document.getElementById('btn-google').addEventListener('click', async () => {
       try {
         await signInWithPopup(auth, googleProvider);
-        // 移動処理は onAuthStateChanged に任せるため、ここでは行わない
       } catch (error) {
-        // ユーザーがポップアップを閉じただけの場合はアラートを出さない
         if (error.code !== 'auth/popup-closed-by-user') {
           alert('Googleログイン失敗: ' + error.message);
         }
@@ -63,9 +63,7 @@
     document.getElementById('btn-github').addEventListener('click', async () => {
       try {
         await signInWithPopup(auth, githubProvider);
-        // 移動処理は onAuthStateChanged に任せるため、ここでは行わない
       } catch (error) {
-        // ユーザーがポップアップを閉じただけの場合はアラートを出さない
         if (error.code !== 'auth/popup-closed-by-user') {
           alert('GitHubログイン失敗: ' + error.message);
         }

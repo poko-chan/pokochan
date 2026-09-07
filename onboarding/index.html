@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>初期登録 - pokochanのWebサイト</title>
+  <style>
+    body { font-family: sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #0070f3; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>プロフィール初期設定</h1>
+  <p>サービスを利用するために追加情報を入力してください。</p>
+
+  <form id="onboarding-form">
+    <div class="form-group">
+      <label for="birthdate">生年月日</label>
+      <input type="date" id="birthdate" required>
+    </div>
+    <button type="submit">登録して次へ</button>
+  </form>
+
+  <script type="module">
+    import { auth, db, doc, setDoc, onAuthStateChanged } from '../lib/firebase.js';
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // ログインしていない場合はログイン画面に戻す
+        window.location.href = '../login/';
+      } else {
+        currentUser = user;
+      }
+    });
+
+    document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const birthdate = document.getElementById('birthdate').value;
+
+      if (!currentUser) return;
+
+      try {
+        // Firestoreの users コレクションに保存
+        await setDoc(doc(db, 'users', currentUser.uid), {
+          name: currentUser.displayName,
+          email: currentUser.email,
+          birthdate: birthdate,
+          createdAt: new Date()
+        });
+
+        // 保存完了後にダッシュボードへ移動
+        window.location.href = '../dashboard/';
+      } catch (error) {
+        alert('保存に失敗しました: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
