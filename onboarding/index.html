@@ -5,24 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>初期登録 - pokochanのWebサイト</title>
   <style>
-    body { font-family: sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+    body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 20px; }
     .form-group { margin-bottom: 20px; text-align: left; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; padding: 8px; box-sizing: border-box; }
-    button { width: 100%; padding: 10px; background: #0070f3; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; }
+    input, select, textarea { 
+      width: 100%; 
+      padding: 10px; 
+      box-sizing: border-box; 
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 15px;
+    }
+    textarea { resize: vertical; height: 80px; }
+    button { 
+      width: 100%; 
+      padding: 12px; 
+      background: #0070f3; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      font-size: 16px; 
+      font-weight: bold;
+      cursor: pointer; 
+    }
+    button:hover { background: #0051a8; }
   </style>
 </head>
 <body>
 
   <h1>プロフィール初期設定</h1>
-  <p>サービスを利用するために追加情報を入力してください。</p>
+  <p>サービスを利用するためにプロフィール情報を入力してください。</p>
 
   <form id="onboarding-form">
+    <!-- 1. ユーザー名（表示名） -->
     <div class="form-group">
-      <label for="birthdate">生年月日</label>
+      <label for="displayName">表示名（ニックネーム） *</label>
+      <input type="text" id="displayName" placeholder="例: ポコちゃん" required>
+    </div>
+
+    <!-- 2. 生年月日 -->
+    <div class="form-group">
+      <label for="birthdate">生年月日 *</label>
       <input type="date" id="birthdate" required>
     </div>
-    <button type="submit">登録して次へ</button>
+
+    <!-- 3. 性別 -->
+    <div class="form-group">
+      <label for="gender">性別</label>
+      <select id="gender">
+        <option value="未設定">回答しない</option>
+        <option value="男性">男性</option>
+        <option value="女性">女性</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+
+    <!-- 4. Webサイト / SNSリンク -->
+    <div class="form-group">
+      <label for="website">Webサイト / X (Twitter) URL</label>
+      <input type="url" id="website" placeholder="https://example.com">
+    </div>
+
+    <!-- 5. 自己紹介 -->
+    <div class="form-group">
+      <label for="bio">自己紹介</label>
+      <textarea id="bio" placeholder="はじめまして！よろしくお願いします。"></textarea>
+    </div>
+
+    <button type="submit">登録してダッシュボードへ</button>
   </form>
 
   <script type="module">
@@ -32,25 +82,39 @@
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // ログインしていない場合はログイン画面に戻す
+        // 未ログイン時はログイン画面に戻す
         window.location.href = '../login/';
       } else {
         currentUser = user;
+        // 初期値としてGoogle/GitHubの表示名を入れておく
+        if (user.displayName) {
+          document.getElementById('displayName').value = user.displayName;
+        }
       }
     });
 
     document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const birthdate = document.getElementById('birthdate').value;
 
       if (!currentUser) return;
 
+      // フォームの値を取得
+      const displayName = document.getElementById('displayName').value;
+      const birthdate = document.getElementById('birthdate').value;
+      const gender = document.getElementById('gender').value;
+      const website = document.getElementById('website').value;
+      const bio = document.getElementById('bio').value;
+
       try {
-        // Firestoreの users コレクションに保存
+        // Firestoreの users/{uid} ドキュメントにまとめて保存
         await setDoc(doc(db, 'users', currentUser.uid), {
-          name: currentUser.displayName,
+          name: displayName,
           email: currentUser.email,
+          photoURL: currentUser.photoURL || '',
           birthdate: birthdate,
+          gender: gender,
+          website: website,
+          bio: bio,
           createdAt: new Date()
         });
 
