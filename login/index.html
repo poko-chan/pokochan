@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン - pokochanのWebサイト</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ログイン</h1>
+
+  <div id="login-section">
+    <p>ログイン方法を選択してください</p>
+    <button id="btn-google">Googleでログイン</button>
+    <button id="btn-github">GitHubでログイン</button>
+  </div>
+
+  <!-- Firebase処理（親階層の lib/firebase.js を読み込む） -->
+  <script type="module">
+    import { 
+      auth, 
+      googleProvider, 
+      githubProvider, 
+      signInWithPopup, 
+      onAuthStateChanged 
+    } from '../lib/firebase.js';
+
+    // すでにログインしている場合はトップページへリダイレクト
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = '../';
+      }
+    });
+
+    // Googleログイン
+    document.getElementById('btn-google').addEventListener('click', async () => {
+      try {
+        await signInWithPopup(auth, googleProvider);
+        window.location.href = '../';
+      } catch (error) {
+        alert('Googleログイン失敗: ' + error.message);
+      }
+    });
+
+    // GitHubログイン
+    document.getElementById('btn-github').addEventListener('click', async () => {
+      try {
+        await signInWithPopup(auth, githubProvider);
+        window.location.href = '../';
+      } catch (error) {
+        alert('GitHubログイン失敗: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
