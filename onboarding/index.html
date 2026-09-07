@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>初期設定 - pokochanのWebサイト</title>
+  <title>プロフィール設定 - pokochan</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -15,138 +15,81 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 20px;
     }
-
-    .container {
+    .card {
       width: 100%;
       max-width: 440px;
-      padding: 30px;
       background: #1e293b;
+      padding: 32px;
       border-radius: 16px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-      position: relative;
-      overflow: hidden;
     }
-
-    /* プログレスバー */
-    .progress-bar {
-      height: 4px;
-      background: #334155;
-      border-radius: 2px;
-      margin-bottom: 30px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      width: 33.3%;
-      background: #38bdf8;
-      transition: width 0.4s ease;
-    }
-
-    /* 質問ステップのスタイルと切り替えアニメーション */
-    .step {
-      display: none;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.4s ease;
-    }
-    .step.active {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    h2 {
-      font-size: 22px;
-      margin-bottom: 10px;
-      color: #f8fafc;
-    }
-    p.subtitle {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
-
+    h1 { font-size: 22px; margin-top: 0; margin-bottom: 8px; }
+    p.sub { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 6px; font-size: 14px; color: #94a3b8; }
+    .optional-tag { font-size: 12px; color: #64748b; margin-left: 6px; }
     input, select {
       width: 100%;
-      padding: 14px 16px;
+      padding: 12px;
       background: #0f172a;
       border: 1px solid #475569;
       border-radius: 8px;
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
       outline: none;
-      transition: border-color 0.2s;
     }
-    input:focus, select:focus {
-      border-color: #38bdf8;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      margin-top: 30px;
-    }
-    button {
-      flex: 1;
+    input:focus, select:focus { border-color: #38bdf8; }
+    .btn {
+      width: 100%;
       padding: 14px;
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
       border-radius: 8px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      border: none;
-      transition: background 0.2s;
+      margin-top: 10px;
     }
-    .btn-next { background: #38bdf8; color: #0f172a; }
-    .btn-next:hover { background: #7dd3fc; }
-    .btn-back { background: #334155; color: #94a3b8; }
-    .btn-back:hover { background: #475569; color: #fff; }
+    .btn:hover { background: #7dd3fc; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- プログレスバー -->
-    <div class="progress-bar">
-      <div id="progress-fill" class="progress-fill"></div>
-    </div>
+  <div class="card">
+    <h1>プロフィール登録</h1>
+    <p class="sub">アカウントの初期設定を行います。</p>
 
-    <!-- Step 1: 名前 -->
-    <div id="step-1" class="step active">
-      <h2>まずはお名前を教えてください</h2>
-      <p class="subtitle">サイト内で表示されるニックネームです</p>
-      <input type="text" id="displayName" placeholder="例: ポコちゃん" required>
-      <div class="btn-group">
-        <button type="button" class="btn-next" onclick="nextStep(1)">次へ</button>
+    <form id="onboarding-form">
+      <div class="form-group">
+        <label for="displayName">表示名 <span style="color:#f87171">*</span></label>
+        <input type="text" id="displayName" placeholder="ぽこちゃん" required>
       </div>
-    </div>
 
-    <!-- Step 2: 生年月日 -->
-    <div id="step-2" class="step">
-      <h2>生年月日を教えてください</h2>
-      <p class="subtitle">あなたに合わせた情報をお届けします</p>
-      <input type="date" id="birthdate" required>
-      <div class="btn-group">
-        <button type="button" class="btn-back" onclick="prevStep(2)">戻る</button>
-        <button type="button" class="btn-next" onclick="nextStep(2)">次へ</button>
+      <div class="form-group">
+        <label for="username">ユーザー名 (@ID) <span style="color:#f87171">*</span></label>
+        <input type="text" id="username" placeholder="poko_chan" pattern="^[a-zA-Z0-9_]+$" title="半角英数字とアンダースコアのみ" required>
       </div>
-    </div>
 
-    <!-- Step 3: 性別 -->
-    <div id="step-3" class="step">
-      <h2>性別を教えてください</h2>
-      <p class="subtitle">該当するものをお選びください（スキップ可）</p>
-      <select id="gender">
-        <option value="未設定">回答しない</option>
-        <option value="男性">男性</option>
-        <option value="女性">女性</option>
-        <option value="その他">その他</option>
-      </select>
-      <div class="btn-group">
-        <button type="button" class="btn-back" onclick="prevStep(3)">戻る</button>
-        <button type="button" id="btn-submit" class="btn-next">完了してスタート</button>
+      <div class="form-group">
+        <label for="gender">性別 <span class="optional-tag">任意</span></label>
+        <select id="gender">
+          <option value="">選択しない</option>
+          <option value="男性">男性</option>
+          <option value="女性">女性</option>
+          <option value="その他">その他</option>
+        </select>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label for="birthdate">誕生日 <span class="optional-tag">任意</span></label>
+        <input type="date" id="birthdate">
+      </div>
+
+      <button type="submit" class="btn">登録を完了する</button>
+    </form>
   </div>
 
   <script type="module">
@@ -159,57 +102,32 @@
         window.location.href = '../login/';
       } else {
         currentUser = user;
-        if (user.displayName && !document.getElementById('displayName').value) {
-          document.getElementById('displayName').value = user.displayName;
-        }
       }
     });
 
-    // ステップ管理関数をグローバルに登録
-    window.nextStep = (current) => {
-      if (current === 1 && !document.getElementById('displayName').value.trim()) {
-        alert('お名前を入力してください');
-        return;
-      }
-      if (current === 2 && !document.getElementById('birthdate').value) {
-        alert('生年月日を選択してください');
-        return;
-      }
-
-      document.getElementById(`step-${current}`).classList.remove('active');
-      const next = current + 1;
-      document.getElementById(`step-${next}`).classList.add('active');
-      document.getElementById('progress-fill').style.width = `${(next / 3) * 100}%`;
-    };
-
-    window.prevStep = (current) => {
-      document.getElementById(`step-${current}`).classList.remove('active');
-      const prev = current - 1;
-      document.getElementById(`step-${prev}`).classList.add('active');
-      document.getElementById('progress-fill').style.width = `${(prev / 3) * 100}%`;
-    };
-
-    // 最終送信処理
-    document.getElementById('btn-submit').addEventListener('click', async () => {
+    document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
       if (!currentUser) return;
 
-      const displayName = document.getElementById('displayName').value;
-      const birthdate = document.getElementById('birthdate').value;
+      const name = document.getElementById('displayName').value.trim();
+      const username = document.getElementById('username').value.trim();
       const gender = document.getElementById('gender').value;
+      const birthdate = document.getElementById('birthdate').value;
 
       try {
         await setDoc(doc(db, 'users', currentUser.uid), {
-          name: displayName,
+          uid: currentUser.uid,
           email: currentUser.email,
-          photoURL: currentUser.photoURL || '',
-          birthdate: birthdate,
-          gender: gender,
+          name: name,
+          username: username,
+          gender: gender || null,
+          birthdate: birthdate || null,
           createdAt: new Date()
         });
 
         window.location.href = '../dashboard/';
-      } catch (error) {
-        alert('保存に失敗しました: ' + error.message);
+      } catch (err) {
+        alert('保存に失敗しました: ' + err.message);
       }
     });
   </script>
