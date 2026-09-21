@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pokochan // Digital Card</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -17,7 +16,7 @@
               cyan: '#06b6d4',
               purple: '#8b5cf6',
               dark: '#0f172a',
-              card: 'rgba(30, 41, 59, 0.7)'
+              card: 'rgba(30, 41, 59, 0.75)'
             }
           },
           fontFamily: {
@@ -45,9 +44,8 @@
       overflow-x: hidden;
     }
 
-    /* Glassmorphism */
     .glass-panel {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.82);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -66,29 +64,29 @@
 
 <body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
 
-  <!-- Simple Fade-In Boot Loader -->
-  <div id="bootScreen" class="fixed inset-0 z-50 bg-[#0b0f19] flex items-center justify-center transition-opacity duration-500">
+  <!-- Simple Fast Boot Screen -->
+  <div id="bootScreen" class="fixed inset-0 z-50 bg-[#0b0f19] flex items-center justify-center transition-opacity duration-300">
     <div class="flex flex-col items-center gap-3">
       <div class="w-8 h-8 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin"></div>
       <span class="text-xs font-mono text-slate-400 tracking-wider">LOADING...</span>
     </div>
   </div>
 
-  <!-- Ambient Glow Background -->
+  <!-- Background Glow Accents -->
   <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
     <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] rounded-full bg-cyan-600/10 blur-[120px]"></div>
     <div class="absolute bottom-10 right-10 w-[25rem] h-[25rem] rounded-full bg-purple-600/10 blur-[120px]"></div>
   </div>
 
-  <!-- Top Navigation -->
-  <header class="w-full max-w-xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between">
+  <!-- Header -->
+  <header class="w-full max-w-xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between z-10">
     <a href="./" class="glass-panel px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 flex items-center gap-2 hover:text-white transition-colors">
       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
       <span>ポータルへ戻る</span>
     </a>
 
     <div class="flex items-center gap-2">
-      <!-- NFC Write / Share Trigger -->
+      <!-- NFC Share Trigger -->
       <button onclick="triggerNfcShare()" title="NFCで共有" class="glass-panel p-2.5 rounded-xl text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-1.5 text-xs font-mono">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8.32a7.43 7.43 0 0 1 0 7.36"></path><path d="M9.46 6.21a11.76 11.76 0 0 1 0 11.58"></path><path d="M12.91 4.1a16.1 16.1 0 0 1 0 15.8"></path><path d="M16.37 2a20.43 20.43 0 0 1 0 20"></path></svg>
         <span class="hidden sm:inline">NFC</span>
@@ -98,77 +96,120 @@
       <button onclick="openQrModal()" title="QRコードを表示" class="glass-panel p-2.5 rounded-xl text-slate-300 hover:text-cyan-400 transition-colors">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       </button>
+
+      <!-- Share Sheet Trigger -->
+      <button onclick="triggerNativeShare()" title="共有する" class="glass-panel p-2.5 rounded-xl text-slate-300 hover:text-cyan-400 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main Profile Card Container -->
   <main class="w-full max-w-xl mx-auto px-4 py-4 flex flex-col items-center">
 
-    <!-- Profile Card Header -->
-    <div class="w-full glass-panel rounded-3xl p-6 sm:p-8 mb-6 relative overflow-hidden shadow-xl">
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500"></div>
+    <div class="w-full glass-panel rounded-3xl overflow-hidden mb-6 relative shadow-xl">
+      
+      <!-- Cover Photo Section -->
+      <div class="w-full h-32 sm:h-40 bg-slate-800 relative overflow-hidden">
+        <img 
+          id="coverImage"
+          src="/image/card/cover-photo.png" 
+          alt="Cover Photo" 
+          class="w-full h-full object-cover"
+          onerror="handleCoverError()"
+        >
+        <!-- Cover Fallback Gradient if missing -->
+        <div id="coverFallback" class="absolute inset-0 bg-gradient-to-r from-cyan-900 via-indigo-900 to-purple-900 opacity-80 hidden"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-black/30"></div>
+      </div>
 
-      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-        
-        <!-- Profile Image & Error Fallback -->
-        <div class="relative shrink-0">
-          <div class="w-24 h-24 rounded-2xl p-[2px] bg-gradient-to-tr from-cyan-500 to-purple-500 shadow-lg">
-            <div id="photoBox" class="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center overflow-hidden relative">
-              <img 
-                id="profileImage"
-                src="/image/card/profile-photo.png" 
-                alt="pokochan" 
-                class="w-full h-full object-cover rounded-2xl"
-                onerror="handleImageError()"
-              >
-              <!-- Fallback Notice when image fails -->
-              <div id="imageFallbackNotice" class="hidden absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-2 text-center text-slate-400">
-                <span class="text-[10px] font-medium leading-tight">画像を読み込み<br>ませんでした</span>
+      <div class="px-6 sm:px-8 pb-6 pt-0 relative">
+
+        <div class="flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-12 sm:-mt-14 mb-4">
+          <!-- Profile Image with Fallback -->
+          <div class="relative shrink-0">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-[3px] bg-slate-900 shadow-2xl">
+              <div id="photoBox" class="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center overflow-hidden relative border border-slate-700">
+                <img 
+                  id="profileImage"
+                  src="/image/card/profile-photo.png" 
+                  alt="pokochan" 
+                  class="w-full h-full object-cover rounded-2xl"
+                  onerror="handleImageError()"
+                >
+                <div id="imageFallbackNotice" class="hidden absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-2 text-center text-slate-400">
+                  <span class="text-[10px] font-medium leading-tight">画像を読み込み<br>ませんでした</span>
+                </div>
               </div>
             </div>
+            <!-- Online status dot -->
+            <span class="absolute bottom-1 right-1 flex h-3.5 w-3.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-slate-900"></span>
+            </span>
           </div>
-          <!-- Online status dot -->
-          <span class="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5 flex h-3.5 w-3.5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-slate-900"></span>
-          </span>
+
+          <!-- Identity & Bio Header -->
+          <div class="flex-1 text-center sm:text-left pt-2 sm:pt-0">
+            <h1 class="text-2xl font-bold tracking-tight text-white mb-1 flex items-center justify-center sm:justify-start gap-2">
+              pokochan
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Official</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              テクノロジー・プログラミング・学習の記録。各種SNSやリンクまとめはこちらから！
+            </p>
+          </div>
         </div>
 
-        <!-- Identity & Bio -->
-        <div class="flex-1 text-center sm:text-left">
-          <h1 class="text-2xl font-bold tracking-tight text-white mb-1 flex items-center justify-center sm:justify-start gap-2">
-            pokochan
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Official</span>
-          </h1>
+        <!-- Contact Action Button -->
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-6">
+          <button onclick="addToContacts()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-medium flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/20 transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            <span>連絡先に追加 (vCard)</span>
+          </button>
           
-          <p class="text-xs font-mono text-slate-400 mb-2.5">@pokochan0504</p>
-          
-          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
-            テクノロジー・プログラミング・学習の記録。各種SNSやリンクまとめはこちらから！
-          </p>
+          <button onclick="toggleDigitalBadge()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-medium flex items-center gap-1.5 border border-slate-700 transition-all">
+            <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span id="badgeBtnText">名刺バッジ表示</span>
+          </button>
+        </div>
 
-          <!-- Contact Mail & vCard Buttons -->
-          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <button onclick="copyToClipboard('uq64f5a9e@mozmail.com', 'メールアドレスをコピーしました')" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-slate-700 transition-colors">
-              <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              <span>メールをコピー</span>
-            </button>
-            <button onclick="downloadVCard()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-slate-700 transition-colors">
-              <svg class="w-3.5 h-3.5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>連絡先 (.vcf)</span>
-            </button>
+        <!-- Contact Info Blocks (Digital Card Style) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-800/80">
+          
+          <!-- Email Block -->
+          <div onclick="copyToClipboard('uq64f5a9e@mozmail.com', 'メールアドレスをコピーしました')" class="group p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 cursor-pointer transition-all">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2 text-xs font-mono text-cyan-400">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span>メールアドレス</span>
+              </div>
+              <span class="text-[10px] text-slate-500 group-hover:text-cyan-400 font-mono transition-colors">コピー</span>
+            </div>
+            <div class="text-xs font-mono text-white truncate mb-1">uq64f5a9e@mozmail.com</div>
+            <div class="text-[10px] text-slate-500">※プライバシー保護のため</div>
           </div>
-          <!-- Privacy notice for email -->
-          <div class="text-[10px] text-slate-500 mt-2 text-center sm:text-left">
-            ※プライバシー保護のため、メールアドレスは上記よりコピーしてご利用ください。
+
+          <!-- Digital Status Block -->
+          <div class="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2 text-xs font-mono text-purple-400">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>タイムゾーン</span>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">JST (UTC+9)</span>
+            </div>
+            <div id="liveClock" class="text-xs font-mono text-white font-medium">00:00:00</div>
+            <div class="text-[10px] text-slate-500 mt-1">東京 / 日本</div>
           </div>
 
         </div>
 
       </div>
+
     </div>
 
-    <!-- Links Container -->
+    <!-- Links Grid Container -->
     <div id="linksGrid" class="w-full space-y-3">
       <!-- Populated via JavaScript -->
     </div>
@@ -198,7 +239,34 @@
     </div>
   </div>
 
-  <!-- Toast Notification Bar -->
+  <!-- Digital ID Badge Modal (Virtual ID Card Simulation) -->
+  <div id="badgeModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-sm glass-panel rounded-3xl p-6 relative border border-cyan-500/30 shadow-2xl overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500"></div>
+      
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-mono text-cyan-400 tracking-wider">OFFICIAL DIGITAL PASS</span>
+        <button onclick="toggleDigitalBadge()" class="text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 text-center relative mb-4">
+        <div class="w-20 h-20 rounded-xl bg-slate-800 mx-auto mb-3 overflow-hidden border border-slate-700">
+          <img src="/image/card/profile-photo.png" alt="pokochan" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/80x80/1e293b/06b6d4?text=P'">
+        </div>
+        <h3 class="text-lg font-bold text-white">pokochan</h3>
+        <p class="text-xs font-mono text-cyan-400 mb-3">ID: POKO-0504-VERIFIED</p>
+        <div class="inline-block bg-white p-2 rounded-lg" id="badgeQrcode"></div>
+      </div>
+
+      <div class="text-[11px] text-slate-400 text-center font-mono">
+        このデジタルパスはpokochanの公式連絡先およびSNSリンク一覧へのアクセスを証明します。
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-700 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-medium transition-all duration-300 opacity-0 translate-y-4 pointer-events-none">
     <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
     <span id="toastMessage">通知メッセージ</span>
@@ -213,7 +281,7 @@
     const linksData = [
       {
         title: "X (旧 Twitter)",
-        handle: "@pokochan0504",
+        handle: "pokochan0504",
         url: "https://x.com/pokochan0504",
         desc: "日々のつぶやきや最新情報",
         badge: "SNS",
@@ -221,7 +289,7 @@
       },
       {
         title: "Instagram",
-        handle: "@pokochan0504",
+        handle: "pokochan0504",
         url: "https://www.instagram.com/pokochan0504",
         desc: "写真や日常の記録",
         badge: "SNS",
@@ -249,12 +317,12 @@
         url: "https://note.com/poko_chan_",
         desc: "思考の記録やコラムブログ",
         badge: "BLOG",
-        iconSvg: `<svg viewBox="0 0 44 44" class="w-5 h-5 fill-current text-[#2cb696]"><path fill="#2cb696" d="M0 0h44v44H0z"/><path fill="#fff" d="M14 13.5c0-.8.7-1.5 1.5-1.5h3c.8 0 1.5.7 1.5 1.5v3.4c1.1-2.4 3-3.9 6-3.9 4.5 0 7 3.1 7 8.5v11c0 .8-.7 1.5-1.5 1.5h-3c-.8 0-1.5-.7-1.5-1.5V23c0-3.3-1.2-4.5-3.5-4.5-2.5 0-4 1.7-4 4.5v9.5c0 .8-.7 1.5-1.5 1.5h-3c-.8 0-1.5-.7-1.5-1.5V13.5z"/></svg>`
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" class="w-5 h-5"><path fill="#2cb696" d="M0 0h44v44H0z"/><path fill="#fff" d="M14 13.5c0-.8.7-1.5 1.5-1.5h3c.8 0 1.5.7 1.5 1.5v3.4c1.1-2.4 3-3.9 6-3.9 4.5 0 7 3.1 7 8.5v11c0 .8-.7 1.5-1.5 1.5h-3c-.8 0-1.5-.7-1.5-1.5V23c0-3.3-1.2-4.5-3.5-4.5-2.5 0-4 1.7-4 4.5v9.5c0 .8-.7 1.5-1.5 1.5h-3c-.8 0-1.5-.7-1.5-1.5V13.5z"/></svg>`
       },
       {
         title: "Qiita",
-        handle: "poko_chan",
-        url: "https://qiita.com/poko_chan",
+        handle: "poko_chan_",
+        url: "https://qiita.com/poko_chan_",
         desc: "プログラミングTips・技術共有",
         badge: "TECH",
         iconSvg: `<svg class="w-5 h-5 fill-current text-[#55c500]" viewBox="0 0 512 512"><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zM368 336c-17.7 0-32 14.3-32 32s14.3 32 32 32h32c17.7 0 32-14.3 32-32s-14.3-32-32-32h-32zm-112 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h32c17.7 0 32-14.3 32-32s-14.3-32-32-32h-32zm144-96c-17.7 0-32 14.3-32 32s14.3 32 32 32h64c17.7 0 32-14.3 32-32s-14.3-32-32-32h-64zm-192 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H108z"/></svg>`
@@ -277,12 +345,19 @@
       }
     ];
 
-    // Image loading error handler
+    // Image loading error handlers
     function handleImageError() {
       const img = document.getElementById('profileImage');
       const fallback = document.getElementById('imageFallbackNotice');
       if (img) img.style.display = 'none';
       if (fallback) fallback.classList.remove('hidden');
+    }
+
+    function handleCoverError() {
+      const coverImg = document.getElementById('coverImage');
+      const coverFallback = document.getElementById('coverFallback');
+      if (coverImg) coverImg.style.display = 'none';
+      if (coverFallback) coverFallback.classList.remove('hidden');
     }
 
     // Render Links List
@@ -350,8 +425,8 @@
       }, 2000);
     }
 
-    // vCard (.vcf) download generator
-    function downloadVCard() {
+    // Add to Contacts (vCard file download with direct contact add trigger)
+    function addToContacts() {
       const vcard = [
         "BEGIN:VCARD",
         "VERSION:3.0",
@@ -367,12 +442,12 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `pokochan_contact.vcf`;
+      a.download = `pokochan.vcf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast("連絡先 (.vcf) をダウンロードしました");
+      showToast("連絡先 (.vcf) をダウンロードしました（連絡先に追加）");
     }
 
     // NFC Sharing Trigger (Web NFC API)
@@ -389,6 +464,18 @@
         }
       } else {
         showToast("このブラウザはNFC共有に未対応です（URLをコピーします）");
+        copyToClipboard(window.location.href, "ページURLをコピーしました");
+      }
+    }
+
+    // Native Share Sheet
+    function triggerNativeShare() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'pokochan // Digital Card',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
         copyToClipboard(window.location.href, "ページURLをコピーしました");
       }
     }
@@ -415,22 +502,59 @@
       document.getElementById('qrModal').classList.add('hidden');
     }
 
-    // Simple Boot Screen Removal
+    // Digital Badge Modal Toggle
+    function toggleDigitalBadge() {
+      const modal = document.getElementById('badgeModal');
+      const badgeQrcode = document.getElementById('badgeQrcode');
+      if (modal.classList.contains('hidden')) {
+        badgeQrcode.innerHTML = '';
+        new QRCode(badgeQrcode, {
+          text: window.location.href,
+          width: 120,
+          height: 120,
+          colorDark : "#0b0f19",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.M
+        });
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Live Clock Update
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) {
+        clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+      }
+    }
+
+    // Simple Boot Screen Removal & Init
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('currentYear').textContent = new Date().getFullYear();
       renderLinks();
+      updateClock();
+      setInterval(updateClock, 1000);
       
       setTimeout(() => {
         const boot = document.getElementById('bootScreen');
         if (boot) {
           boot.style.opacity = '0';
-          setTimeout(() => boot.style.display = 'none', 500);
+          setTimeout(() => boot.style.display = 'none', 300);
         }
       }, 300);
     });
 
     document.getElementById('qrModal').onclick = (e) => {
       if (e.target.id === 'qrModal') closeQrModal();
+    };
+    document.getElementById('badgeModal').onclick = (e) => {
+      if (e.target.id === 'badgeModal') toggleDigitalBadge();
     };
   </script>
 </body>
