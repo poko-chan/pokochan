@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pokochan - Official Site</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN for minimalist UI icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-sky-50/50 to-indigo-50/40 text-slate-800 flex flex-col justify-between antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- Header / Navigation Bar -->
+  <header class="w-full max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
+    <a href="./" class="flex items-center gap-2 font-bold text-lg tracking-tight text-slate-800 hover:opacity-80 transition-opacity">
+      <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-indigo-200">
+        P
+      </div>
+      <span>pokochan</span>
+    </a>
+
+    <!-- Quick login top link -->
+    <a href="/login" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/60">
+      <i data-lucide="log-in" class="w-4 h-4"></i>
+      <span>ログイン</span>
+    </a>
+  </header>
+
+  <main class="w-full max-w-xl mx-auto px-6 py-12 flex-1 flex flex-col items-center justify-center text-center">
+    
+    <!-- Profile Avatar & Title -->
+    <div class="mb-6 relative">
+      <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 p-1 shadow-md shadow-indigo-100">
+        <div class="w-full h-full rounded-full bg-white flex items-center justify-center text-indigo-600">
+          <i data-lucide="sparkles" class="w-10 h-10 stroke-[1.75]"></i>
+        </div>
+      </div>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-2">
+      Wellcome
+    </h1>
+    <p class="text-slate-500 text-sm sm:text-base max-w-sm mb-10 leading-relaxed">
+      pokochan総合サイト
+    </p>
+
+    <!-- Primary Action Links -->
+    <div class="w-full space-y-3.5">
+      
+      <!-- Business Card Link (/card) -->
+      <a href="/card" class="group glass-card w-full p-4 rounded-2xl border border-slate-200/80 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-100/50 transition-all duration-200 flex items-center justify-between text-left">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-200">
+            <i data-lucide="contact" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">電子名刺</div>
+            <div class="text-xs text-slate-500">プロフィール</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all"></i>
+      </a>
+
+      <!-- Login Link (/login) -->
+      <a href="/login" class="group glass-card w-full p-4 rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100/50 transition-all duration-200 flex items-center justify-between text-left">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-slate-800 group-hover:text-white transition-colors duration-200">
+            <i data-lucide="key-round" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="font-semibold text-slate-900 group-hover:text-slate-700 transition-colors">ログイン</div>
+            <div class="text-xs text-slate-500">アカウントへのサインイン</div>
+          </div>
+        </div>
+        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-slate-800 group-hover:translate-x-0.5 transition-all"></i>
+      </a>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-4xl mx-auto px-6 py-8 text-center text-xs text-slate-400">
+    <p>&copy; <span id="year"></span> pokochan. All rights reserved.</p>
+  </footer>
+
+  <!-- Script for icons & dynamic date -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Set current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
