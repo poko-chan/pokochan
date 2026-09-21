@@ -1,1 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pokochan // Digital Card</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cyan: '#06b6d4',
+              purple: '#8b5cf6',
+              dark: '#0f172a',
+              card: 'rgba(30, 41, 59, 0.7)'
+            }
+          },
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      background-color: #0b0f19;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .link-card {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .link-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(6, 182, 212, 0.4);
+      box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.15);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+  <!-- Simple Fade-In Boot Loader -->
+  <div id="bootScreen" class="fixed inset-0 z-50 bg-[#0b0f19] flex items-center justify-center transition-opacity duration-500">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-10 h-10 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin"></div>
+      <span class="text-xs font-mono text-slate-400 tracking-wider">LOADING PROFILE...</span>
+    </div>
+  </div>
+
+  <!-- Ambient Glow Background -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] rounded-full bg-cyan-600/10 blur-[120px]"></div>
+    <div class="absolute bottom-10 right-10 w-[25rem] h-[25rem] rounded-full bg-purple-600/10 blur-[120px]"></div>
+  </div>
+
+  <!-- Top Navigation -->
+  <header class="w-full max-w-xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between">
+    <a href="./" class="glass-panel px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 flex items-center gap-2 hover:text-white transition-colors">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+      <span>ポータルへ戻る</span>
+    </a>
+
+    <div class="flex items-center gap-2">
+      <!-- QR Code Modal Trigger -->
+      <button onclick="openQrModal()" title="QRコードを表示" class="glass-panel p-2.5 rounded-xl text-slate-300 hover:text-cyan-400 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="w-full max-w-xl mx-auto px-4 py-4 flex flex-col items-center">
+
+    <!-- Profile Card Header -->
+    <div class="w-full glass-panel rounded-3xl p-6 sm:p-8 mb-6 relative overflow-hidden shadow-xl">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500"></div>
+
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+        
+        <!-- Profile Image & Error Fallback -->
+        <div class="relative shrink-0">
+          <div class="w-24 h-24 rounded-2xl p-[2px] bg-gradient-to-tr from-cyan-500 to-purple-500 shadow-lg">
+            <div id="photoBox" class="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center overflow-hidden relative">
+              <img 
+                id="profileImage"
+                src="/image/card/profile-photo.png" 
+                alt="pokochan" 
+                class="w-full h-full object-cover rounded-2xl"
+                onerror="handleImageError()"
+              >
+              <!-- Fallback Notice when image fails -->
+              <div id="imageFallbackNotice" class="hidden absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-2 text-center text-slate-400">
+                <span class="text-[10px] font-medium leading-tight">画像を読み込み<br>ませんでした</span>
+              </div>
+            </div>
+          </div>
+          <!-- Online status dot -->
+          <span class="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5 flex h-3.5 w-3.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-slate-900"></span>
+          </span>
+        </div>
+
+        <!-- Identity & Bio -->
+        <div class="flex-1 text-center sm:text-left">
+          <h1 class="text-2xl font-bold tracking-tight text-white mb-1 flex items-center justify-center sm:justify-start gap-2">
+            pokochan
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Official</span>
+          </h1>
+          
+          <p class="text-xs font-mono text-slate-400 mb-2.5">@pokochan0504</p>
+          
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+            テクノロジー・プログラミング・学習の記録。各種SNSやリンクまとめはこちらから！
+          </p>
+
+          <!-- Contact Mail & vCard Buttons -->
+          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <button onclick="copyToClipboard('uq64f5a9e@mozmail.com', 'メールアドレスをコピーしました')" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-slate-700 transition-colors">
+              <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <span>メールをコピー</span>
+            </button>
+            <button onclick="downloadVCard()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-slate-700 transition-colors">
+              <svg class="w-3.5 h-3.5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>連絡先 (.vcf)</span>
+            </button>
+          </div>
+          <!-- Privacy notice for email -->
+          <div class="text-[10px] text-slate-500 mt-2 text-center sm:text-left">
+            ※プライバシー保護のため、メールアドレスは上記よりコピーしてご利用ください。
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Links Container -->
+    <div id="linksGrid" class="w-full space-y-3">
+      <!-- Populated via JavaScript -->
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-xl mx-auto px-4 py-8 text-center text-xs text-slate-500 font-mono">
+    <p>&copy; <span id="currentYear"></span> pokochan. All rights reserved.</p>
+  </footer>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl p-6 max-w-xs w-full text-center border border-slate-700 relative shadow-2xl">
+      <button onclick="closeQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      
+      <h3 class="text-sm font-bold text-white mb-1">QRコードでシェア</h3>
+      <p class="text-xs text-slate-400 mb-4">スマホのカメラで読み取れます</p>
+      
+      <div class="bg-white p-3 rounded-2xl inline-block mb-4 shadow-inner" id="qrcodeCanvas"></div>
+      
+      <button onclick="copyToClipboard(window.location.href, 'ページURLをコピーしました')" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition-colors">
+        URLをコピー
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Bar -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-700 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-medium transition-all duration-300 opacity-0 translate-y-4 pointer-events-none">
+    <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
+    <span id="toastMessage">通知メッセージ</span>
+  </div>
+
+  <script>
+    /**
+     * =========================================================================
+     *  ★ pokochan のリンクデータ一覧
+     * =========================================================================
+     */
+    const linksData = [
+      {
+        title: "X (旧 Twitter)",
+        handle: "@pokochan0504",
+        url: "https://x.com/pokochan0504",
+        desc: "日々のつぶやきや最新情報",
+        badge: "SNS",
+        iconSvg: `<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`
+      },
+      {
+        title: "Instagram",
+        handle: "@pokochan0504",
+        url: "https://www.instagram.com/pokochan0504",
+        desc: "写真や日常の記録",
+        badge: "SNS",
+        iconSvg: `<svg class="w-5 h-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>`
+      },
+      {
+        title: "Facebook",
+        handle: "pokochan0504",
+        url: "https://www.facebook.com/pokochan0504",
+        desc: "ソーシャルネットワーク",
+        badge: "SNS",
+        iconSvg: `<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`
+      },
+      {
+        title: "GitHub",
+        handle: "poko-chan",
+        url: "https://github.com/poko-chan",
+        desc: "開発プロジェクト・リポジトリ",
+        badge: "CODE",
+        iconSvg: `<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`
+      },
+      {
+        title: "note",
+        handle: "poko_chan_",
+        url: "https://note.com/poko_chan_",
+        desc: "思考の記録やコラムブログ",
+        badge: "BLOG",
+        iconSvg: `<svg class="w-5 h-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>`
+      },
+      {
+        title: "Qiita",
+        handle: "poko_chan",
+        url: "https://qiita.com/poko_chan",
+        desc: "プログラミングTips・技術共有",
+        badge: "TECH",
+        iconSvg: `<svg class="w-5 h-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`
+      },
+      {
+        title: "Duolingo",
+        handle: "pokochan_0504",
+        url: "https://www.duolingo.com/profile/pokochan_0504",
+        desc: "言語学習の継続記録",
+        badge: "LEARN",
+        iconSvg: `<svg class="w-5 h-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>`
+      },
+      {
+        title: "Google Map",
+        handle: "Spot Location",
+        url: "https://maps.app.goo.gl/U26aZThAT12suJCr9?g_st=a",
+        desc: "活動拠点・おすすめスポット",
+        badge: "MAP",
+        iconSvg: `<svg class="w-5 h-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`
+      }
+    ];
+
+    // Image loading error handler
+    function handleImageError() {
+      const img = document.getElementById('profileImage');
+      const fallback = document.getElementById('imageFallbackNotice');
+      if (img) img.style.display = 'none';
+      if (fallback) fallback.classList.remove('hidden');
+    }
+
+    // Render Links List
+    function renderLinks() {
+      const grid = document.getElementById('linksGrid');
+      grid.innerHTML = '';
+
+      linksData.forEach(link => {
+        const card = document.createElement('a');
+        card.href = link.url;
+        card.target = "_blank";
+        card.rel = "noopener noreferrer";
+        card.className = "link-card glass-panel w-full p-4 rounded-2xl flex items-center justify-between text-left border border-slate-700/60";
+
+        card.innerHTML = `
+          <div class="flex items-center gap-4 min-w-0 pr-2">
+            <div class="w-11 h-11 rounded-xl bg-slate-800/80 text-cyan-400 flex items-center justify-center shrink-0 border border-slate-700">
+              ${link.iconSvg}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-sm tracking-tight truncate">${link.title}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-800 text-slate-300 border border-slate-700">${link.badge}</span>
+              </div>
+              <p class="text-xs font-mono text-cyan-400/90 truncate mt-0.5">${link.handle}</p>
+              <p class="text-[11px] text-slate-400 truncate mt-0.5">${link.desc}</p>
+            </div>
+          </div>
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Copy helper
+    function copyToClipboard(text, message) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(message);
+      } catch (err) {
+        showToast("コピーに失敗しました");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 2000);
+    }
+
+    // vCard (.vcf) download generator
+    function downloadVCard() {
+      const vcard = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        "FN:pokochan",
+        "N:;pokochan;;;",
+        "EMAIL;TYPE=INTERNET:uq64f5a9e@mozmail.com",
+        "URL:" + window.location.href,
+        "NOTE:pokochan Digital Card - X: @pokochan0504, GitHub: poko-chan",
+        "END:VCARD"
+      ].join("\r\n");
+
+      const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `pokochan_contact.vcf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("連絡先 (.vcf) をダウンロードしました");
+    }
+
+    // QR Modal Controls
+    let qrInstance = null;
+    function openQrModal() {
+      const currentUrl = window.location.href;
+      const modal = document.getElementById('qrModal');
+      const qrcodeCanvas = document.getElementById('qrcodeCanvas');
+      qrcodeCanvas.innerHTML = '';
+      
+      qrInstance = new QRCode(qrcodeCanvas, {
+        text: currentUrl,
+        width: 160,
+        height: 160,
+        colorDark : "#0b0f19",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.M
+      });
+      modal.classList.remove('hidden');
+    }
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    // Simple Boot Screen Removal
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      renderLinks();
+      
+      setTimeout(() => {
+        const boot = document.getElementById('bootScreen');
+        if (boot) {
+          boot.style.opacity = '0';
+          setTimeout(() => boot.style.display = 'none', 500);
+        }
+      }, 300);
+    });
+
+    document.getElementById('qrModal').onclick = (e) => {
+      if (e.target.id === 'qrModal') closeQrModal();
+    };
+  </script>
+</body>
+</html>
